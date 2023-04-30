@@ -14,7 +14,7 @@ train: ../Highway/images/train/  # 128 images
 val: ../Highway/images/val/  # 128 images
 
 # number of classes
-nc: 3
+nc: 12
 
 # class names
 names: [ 'Truck', 'Bus', 'Car','Van','Tow_Truck','Pickup_Truck','Semi_Truck','Box_Truck','Dump_Truck','Construction','Sedan','SUV']
