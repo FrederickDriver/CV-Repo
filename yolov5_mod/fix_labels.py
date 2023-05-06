@@ -1,8 +1,8 @@
 import os
 from PIL import Image
 
-directory = '/content/CV-Repo/new_data/data/labels/train/'
-image_directory = '/content/CV-Repo/new_data/data/images/train/'
+directory = '/content/CV-Repo/new_data/data/labels/test/'
+image_directory = '/content/CV-Repo/new_data/data/images/test/'
 for filename in os.listdir(directory):
     if filename.endswith('.txt'):
         with open(os.path.join(directory, filename)) as f:
@@ -13,9 +13,10 @@ for filename in os.listdir(directory):
             im = Image.open(image_path)
             w, h = im.size
             words[1] =  str(float(words[1])/w)
-            words[3] =  str(float(words[3])/w)
+            copy = words[3]
+            words[3] =  str(float(words[4])/w)
             words[2] =  str(float(words[2])/h)
-            words[4] =  str(float(words[4])/h)
+            words[4] =  str(float(copy)/h)
             words[1] =  str(float(words[1]) + float(words[3])/2)
             words[2] =  str(float(words[2]) + float(words[4])/2)
             to_write = words[0] + " " + words[1] + " " + words[2] + " " + words[3] + " " + words[4]
