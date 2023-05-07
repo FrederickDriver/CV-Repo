@@ -129,7 +129,7 @@ class ExportLabel(object):
                 img_height, img_width = images[image_index].shape[:2]
                 top, left, height, width = float(top)/img_height, float(left)/img_width, float(height)/img_height, float(width)/img_width
                 top, left = (top+(height/2)), (left+(width/2))
-                new_label_string += str(class_number)+ " " + str(top) + " " + str(left) + " " + str(height) + " " + str(width)
+                new_label_string += str(class_number)+ " " + str(left) + " " + str(top) + " " + str(width) + " " + str(height)
                 new_label_string += "\n"
             new_label_string = new_label_string.strip()
             annotations[i] = (datarow_id, new_label_string)
