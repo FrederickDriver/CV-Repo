@@ -74,7 +74,10 @@ def run(
 ):
 
     for source in sources:
+        num_classes = 12
         classes_count = {0:[],1:[],2:[]}
+        for i in range(num_classes):
+            classes_count[i] = []
         source = str(source)
         save_img = not nosave and not source.endswith('.txt')  # save inference images
         is_file = Path(source).suffix[1:] in (VID_FORMATS)
@@ -134,8 +137,8 @@ def run(
             )
         outputs = [None] * nr_sources
 
-        #creating dictionary for tracked where key is vehicle id 
-        # and value contains list of segments, 
+        #creating dictionary for tracked where key is vehicle id
+        # and value contains list of segments,
         # each containing a list of frames
         tracked={}
         jsonObject={}
@@ -223,7 +226,7 @@ def run(
                     }
                     ====Curent====
                     (if previous frame doesn't exist, make a new segment)
-                    [   
+                    [
                         object_id{
                             keyframes:[...]
                         }
@@ -237,7 +240,7 @@ def run(
                     # draw boxes for visualization
                     if len(outputs[i]) > 0:
                         for j, (output, conf) in enumerate(zip(outputs[i], confs)):
-        
+
                             bboxes = output[0:4]
                             id = output[4]
                             cls = output[5]
@@ -255,11 +258,11 @@ def run(
                                 frame = frame_idx + 1
                                 classifications =[{
                                         'name' : 'Type',
-                                        'answer' : { 'name' : names[ int( cls ) ] }        
+                                        'answer' : { 'name' : names[ int( cls ) ] }
                                     }
                                 ]
                                 g_key = {'globalKey': global_key}
-                                
+
 
                                 if id in tracked : #we've seen this trackable object before
                                     #we find the most recent segment of a tracked object
@@ -272,7 +275,7 @@ def run(
                                         last_segment_key_frames.append({
                                             "frame":frame,
                                             "bbox":bbox
-                                            } 
+                                            }
                                         )
                                     else:#if the tracked object was NOT visible in the last frame
                                         #we create a new segment
@@ -286,7 +289,7 @@ def run(
                                     #tracked.update({id : {'segments' : keyFrames}})
                                 else : #We've never seen this tracked object before
                                     #we create our new tracked object and log it for later
-                                    tracked[id]={ 
+                                    tracked[id]={
                                         "name" : "Vehicle",
                                         'dataRow': g_key,
                                         "segments" : [{
@@ -345,12 +348,15 @@ def run(
 
         final_count_pt = str(save_dir)  + '/final_count.txt'
 
-        #final json        
+        #final json
         with open(str(save_dir)+'/bbox_annotation_ndjson.json', "w") as outfile:
             json.dump(list(tracked.values()), outfile)
 
         with open(final_count_pt + '.txt', 'a') as f:
-            f.write(f'classes 0: {len(set(classes_count[0]))} classes 1: {len(set(classes_count[1]))} classes 2: {len(set(classes_count[2]))}')
+            to_write = ''
+            for i in range(num_classes):
+                to_write = to_write + 'class ' + str(i) + ": " + str(len(set(classes_count[i]))) + ' '
+            f.write(to_write)
 
         # Print results
         t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
@@ -367,8 +373,8 @@ def parse_opt():
     parser.add_argument('--yolo-weights', nargs='+', type=str, default=WEIGHTS / 'yolov5m.pt', help='model.pt path(s)')
     parser.add_argument('--strong-sort-weights', type=str, default=WEIGHTS / 'osnet_x0_25_msmt17.pt')
     parser.add_argument('--config-strongsort', type=str, default='strong_sort/configs/strong_sort.yaml')
-    # parser.add_argument('--sources', type=str, default=[], help='file/dir/URL/glob, 0 for webcam')  
-    parser.add_argument('--sources', type=str, nargs='+', help='file/dir/URL/glob, 0 for webcam')  
+    # parser.add_argument('--sources', type=str, default=[], help='file/dir/URL/glob, 0 for webcam')
+    parser.add_argument('--sources', type=str, nargs='+', help='file/dir/URL/glob, 0 for webcam')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
     parser.add_argument('--conf-thres', type=float, default=0.5, help='confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.5, help='NMS IoU threshold')
