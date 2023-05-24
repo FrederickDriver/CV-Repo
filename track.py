@@ -245,7 +245,7 @@ def run(
                             id = output[4]
                             cls = output[5]
 
-                            classes_count[cls].append(id)
+                            #classes_count[cls].append(id)
 
                             if save_txt:
                                 # To labelbox's json format
@@ -266,6 +266,7 @@ def run(
 
                                 if id in tracked : #we've seen this trackable object before
                                     #we find the most recent segment of a tracked object
+
                                     segments = tracked.get(id)["segments"]
                                     last_segment = segments[-1]
                                     last_segment_key_frames = last_segment["keyframes"]
@@ -289,6 +290,7 @@ def run(
                                     #tracked.update({id : {'segments' : keyFrames}})
                                 else : #We've never seen this tracked object before
                                     #we create our new tracked object and log it for later
+                                    classes_count[cls].append(id)
                                     tracked[id]={
                                         "name" : "Vehicle",
                                         'dataRow': g_key,
