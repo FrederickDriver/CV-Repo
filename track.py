@@ -55,6 +55,7 @@ def run(
         save_conf=False,  # save confidences in --save-txt labels
         save_crop=False,  # save cropped prediction boxes
         save_vid=False,  # save confidences in --save-txt labels
+        save_class=False,  # save classes in --save-txt labels
         nosave=False,  # do not save images/videos
         classes=None,  # filter by class: --class 0, or --class 0 2 3
         agnostic_nms=False,  # class-agnostic NMS
@@ -297,12 +298,17 @@ def run(
                                             }]
                                         }]
                                     }
-                                
+                                if save_class is False:
                                 # Write MOT compliant results to file
-                                with open(txt_path + '.txt', 'a') as f:
-                                    f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox["left"],  # MOT format
+                                    with open(txt_path + '.txt', 'a') as f:
+                                        f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox["left"],  # MOT format
                                                                 bbox["top"], bbox["width"], bbox["height"], -1, -1, -1, i))
-                                
+                                #write class + MOT to file
+                                else :
+                                    with open(txt_path + '.txt', 'a') as f:
+                                        f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, names[ int( cls ) ], bbox["left"],  # MOT format
+                                                                bbox["top"], bbox["width"], bbox["height"], -1, -1, -1, i))
+                               
                             if save_vid or save_crop or show_vid:  # Add bbox to image
                                 c = int(cls)  # integer class
                                 id = int(id)  # integer id
@@ -377,6 +383,7 @@ def parse_opt():
     parser.add_argument('--show-vid', action='store_true', help='display tracking video results')
     parser.add_argument('--save-txt', action='store_true', help='save results to *.txt')
     parser.add_argument('--save-conf', action='store_true', help='save confidences in --save-txt labels')
+    parser.add_argument('--save-class', action='store_true', help='save class to *.txt')
     parser.add_argument('--save-crop', action='store_true', help='save cropped prediction boxes')
     parser.add_argument('--save-vid', action='store_true', help='save video tracking results')
     parser.add_argument('--nosave', action='store_true', help='do not save images/videos')
@@ -396,6 +403,9 @@ def parse_opt():
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
     parser.add_argument('--verbose', default=False, action='store_true', help='Write Logs during runtime')
+
+    parser.add_argument('--true-classes', nargs='+', type=str, help='true_label:id json path')
+
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
     print_args(vars(opt))
