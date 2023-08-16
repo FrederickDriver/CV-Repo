@@ -307,7 +307,7 @@ def run(
                                 #write class + MOT to file
                                 else :
                                     with open(txt_path + '.txt', 'a') as f:
-                                        f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, names[ int( cls ) ], bbox["left"],  # MOT format
+                                        f.write(('%g ' * 11 + '\n') % (frame_idx + 1, id, cls , bbox["left"],  # MOT format
                                                                 bbox["top"], bbox["width"], bbox["height"], -1, -1, -1, i))
                                
                             if save_vid or save_crop or show_vid:  # Add bbox to image
