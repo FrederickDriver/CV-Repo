@@ -140,6 +140,7 @@ def run(
         # and value contains list of segments, 
         # each containing a list of frames
         tracked={}
+        tracked_cls={}
         jsonObject={}
         global_key =''
         # Run tracking
@@ -245,7 +246,8 @@ def run(
                             cls = output[5]
 
                             classes_count[cls].append(id)
-
+                            tracked_cls[id] = cls
+                            
                             if save_txt:
                                 # To labelbox's json format
                                 bbox = {
@@ -299,16 +301,12 @@ def run(
                                             }]
                                         }]
                                     }
-                                if save_class is False:
+                                
                                 # Write MOT compliant results to file
                                     with open(txt_path + '.txt', 'a') as f:
                                         f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox["left"],  # MOT format
                                                                 bbox["top"], bbox["width"], bbox["height"], -1, -1, -1, i))
-                                #write class + MOT to file
-                                else :
-                                    with open(txt_path + '.txt', 'a') as f:
-                                        f.write(('%g ' * 11 + '\n') % (frame_idx + 1, id, cls , bbox["left"],  # MOT format
-                                                                bbox["top"], bbox["width"], bbox["height"], -1, -1, -1, i))
+
                                
                             if save_vid or save_crop or show_vid:  # Add bbox to image
                                 c = int(cls)  # integer class
@@ -355,6 +353,10 @@ def run(
         #final json        
         with open(str(save_dir)+'/bbox_annotation_ndjson.json', "w") as outfile:
             json.dump(list(tracked.values()), outfile)
+        
+        if save_class:
+            with open(txt_path + '_classes.json', 'w') as outfile:
+                json.dump(list(tracked_cls.values()), outfile)
 
         with open(final_count_pt + '.txt', 'a') as f:
             f.write(f'classes 0: {len(set(classes_count[0]))} classes 1: {len(set(classes_count[1]))} classes 2: {len(set(classes_count[2]))}')
