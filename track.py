@@ -45,7 +45,7 @@ def run(
         yolo_weights=WEIGHTS / 'yolov5m.pt',  # model.pt path(s),
         strong_sort_weights=WEIGHTS / 'osnet_x0_25_msmt17.pt',  # model.pt path,
         config_strongsort=ROOT / 'strong_sort/configs/strong_sort.yaml',
-        true_classes="",
+        true_classes=None,
         imgsz=(640, 640),  # inference size (height, width)
         conf_thres=0.25,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
@@ -143,6 +143,9 @@ def run(
         tracked_cls={}
         jsonObject={}
         global_key =''
+        if true_classes:
+            true_cls_dict = json.load(true_classes)
+
         # Run tracking
         model.warmup(imgsz=(1 if pt else nr_sources, 3, *imgsz))  # warmup
         dt, seen = [0.0, 0.0, 0.0, 0.0], 0
@@ -245,8 +248,11 @@ def run(
                             id = output[4]
                             cls = output[5]
 
+                            if true_classes and (id in true_cls_dict):
+                                cls = true_cls_dict[id]
+                            
                             classes_count[cls].append(id)
-                            tracked_cls[id] = cls
+                            tracked_cls[id] = int(cls)
                             
                             if save_txt:
                                 # To labelbox's json format
@@ -355,8 +361,9 @@ def run(
             json.dump(list(tracked.values()), outfile)
         
         if save_class:
+            print(txt_path + '_classes.json')
             with open(txt_path + '_classes.json', 'w') as outfile:
-                json.dump(list(tracked_cls.values()), outfile)
+                json.dump(tracked_cls, outfile)
 
         with open(final_count_pt + '.txt', 'a') as f:
             f.write(f'classes 0: {len(set(classes_count[0]))} classes 1: {len(set(classes_count[1]))} classes 2: {len(set(classes_count[2]))}')
