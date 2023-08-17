@@ -45,7 +45,7 @@ def run(
         yolo_weights=WEIGHTS / 'yolov5m.pt',  # model.pt path(s),
         strong_sort_weights=WEIGHTS / 'osnet_x0_25_msmt17.pt',  # model.pt path,
         config_strongsort=ROOT / 'strong_sort/configs/strong_sort.yaml',
-        true_classes=None,
+        true_classes="",
         imgsz=(640, 640),  # inference size (height, width)
         conf_thres=0.25,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
@@ -144,8 +144,9 @@ def run(
         jsonObject={}
         global_key =''
         if true_classes:
-            true_cls_dict = json.load(true_classes)
-
+            with open(true_classes) as f:
+                true_cls_dict = json.load(f)
+            
         # Run tracking
         model.warmup(imgsz=(1 if pt else nr_sources, 3, *imgsz))  # warmup
         dt, seen = [0.0, 0.0, 0.0, 0.0], 0
@@ -414,7 +415,7 @@ def parse_opt():
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
     parser.add_argument('--verbose', default=False, action='store_true', help='Write Logs during runtime')
 
-    parser.add_argument('--true-classes', nargs='+', type=str, help='true_label:id json path')
+    parser.add_argument('--true-classes', type=str, help='true_label:id json path')
 
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
